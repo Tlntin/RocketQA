@@ -46,6 +46,7 @@ __MODELS_MD5 = {
         "zh_dureader_ce_v2": "552675c98c546e798a33cc84325921f6"
 }
 
+
 def available_models():
     """
     Return the names of available RocketQA models
@@ -72,7 +73,7 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
 
     if model in __MODELS:
         model_name = model
-        print (f"RocketQA model [{model_name}]", file=sys.stderr)
+        print(f"RocketQA model [{model_name}]", file=sys.stderr)
         rocketqa_model = True
         model_path = os.path.expanduser('~/.rocketqa/') + model_name + '/'
         if not os.path.exists(model_path):
@@ -88,7 +89,7 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
             model_type = 'cross_encoder'
 
     if rocketqa_model is False:
-        print ("User-specified model", file=sys.stderr)
+        print("User-specified model", file=sys.stderr)
         conf_path = model
         model_name = model
         if not os.path.isfile(conf_path):
@@ -115,12 +116,12 @@ def load_model(model, use_cuda=False, device_id=0, batch_size=1):
     encoder_conf["device_id"] = device_id
     encoder_conf["batch_size"] = batch_size
     encoder_conf["model_name"] = model_name
-
+    # for debug
     if model_type[0] == "d":
         encoder = DualEncoder(**encoder_conf)
     elif model_type[0] == "c":
         encoder = CrossEncoder(**encoder_conf)
-    print ("Load model done", file=sys.stderr)
+    print("Load model done", file=sys.stderr)
     return encoder
 
 
@@ -131,7 +132,7 @@ def __download(model_name):
     download_url = __MODELS[model_name]
 
     if not os.path.exists(download_dst):
-        print (f"Download RocketQA model [{model_name}]", file=sys.stderr)
+        print(f"Download RocketQA model [{model_name}]", file=sys.stderr)
         with urllib.request.urlopen(download_url) as source, open(download_dst, "wb") as output:
             with tqdm(total=int(source.info().get("Content-Length")), ncols=80, unit='iB', unit_scale=True, unit_divisor=1024) as loop:
                 while True:
@@ -142,7 +143,7 @@ def __download(model_name):
                     output.write(buffer)
                     loop.update(len(buffer))
 
-    file_md5= __get_file_md5(download_dst)
+    file_md5 = __get_file_md5(download_dst)
     if file_md5 != __MODELS_MD5[model_name]:
         raise Exception(f"Model file [{download_dst}] exists, but md5 doesnot match")
 
@@ -150,14 +151,15 @@ def __download(model_name):
         t = tarfile.open(download_dst)
         t.extractall(os.path.expanduser('~/.rocketqa/'))
     except Exception as e:
-        print (str(e), file=sys.stderr)
+        print(str(e), file=sys.stderr)
         return False
 
     return True
 
+
 def __get_file_md5(fname):
     m = hashlib.md5()
-    with open(fname,'rb') as fobj:
+    with open(fname, 'rb') as fobj:
         while True:
             data = fobj.read(4096)
             if not data:

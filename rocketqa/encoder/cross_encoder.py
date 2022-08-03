@@ -216,7 +216,8 @@ class CrossEncoder(object):
             random_seed=args.random_seed,
             tokenizer=args.tokenizer,
             for_cn=args.for_cn,
-            task_id=args.task_id)
+            task_id=args.task_id
+        )
 
         startup_prog = fluid.Program()
         if args.random_seed is not None:
@@ -261,10 +262,11 @@ class CrossEncoder(object):
                     weight_decay=args.weight_decay,
                     scheduler=args.lr_scheduler,
                     use_dynamic_loss_scaling=args.use_dynamic_loss_scaling,
-		            incr_every_n_steps=args.incr_every_n_steps,
-		            decr_every_n_nan_or_inf=args.decr_every_n_nan_or_inf,
-		            incr_ratio=args.incr_ratio,
-		            decr_ratio=args.decr_ratio)
+                    incr_every_n_steps=args.incr_every_n_steps,
+                    decr_every_n_nan_or_inf=args.decr_every_n_nan_or_inf,
+                    incr_ratio=args.incr_ratio,
+                    decr_ratio=args.decr_ratio
+                )
 
         if args.verbose:
             if args.in_tokens:
@@ -291,6 +293,7 @@ class CrossEncoder(object):
 
         steps = 0
         time_begin = time.time()
+        start_time0 = time_begin
         current_epoch = 0
         last_epoch = 0
         total_loss = []
@@ -303,28 +306,65 @@ class CrossEncoder(object):
                     current_example, current_epoch = reader.get_train_progress()
                     time_end = time.time()
                     used_time = time_end - time_begin
+                    used_time2 = time_end - start_time0
 
                     train_fetch_list = [
                         graph_vars["loss"], graph_vars["accuracy"]
                     ]
-                    outputs = self.exe.run(fetch_list=train_fetch_list, program=train_program)
+                    outputs = self.exe.run(
+                        fetch_list=train_fetch_list,
+                        program=train_program
+                    )
                     tmp_loss = np.mean(outputs[0])
                     tmp_acc = np.mean(outputs[1])
                     total_loss.append(tmp_loss)
+                    used_hour = int(used_time2 // 3600)
+                    used_minute = int((used_time2 - 3600 * used_hour) // 60)
+                    used_second = int(used_time2 - 3600 * used_hour \
+                        - 60 * used_minute)
+                    step_speed = args.skip_steps / used_time
+                    progress = round(
+                        100 * current_example * dev_count / num_train_examples,
+                        4
+                    )
+                    total_time = max_train_steps / step_speed
+                    total_hour = int(total_time // 3600)
+                    total_minute = int((total_time - 3600 * total_hour) // 60)
+                    total_second = int(total_time - 3600 * total_hour \
+                         - 60 * total_minute)
+                    used_time_str = f"{used_hour:02d}:{used_minute:02d}:{used_second:02d}"
+                    total_time_str = f"{total_hour:02d}:{total_minute:02d}:{total_second:02d}"
                     log.info(
-                        "epoch: %d, progress: %d/%d, step: %d, ave loss: %f, "
-                        "ave acc: %f, speed: %f steps/s" %
-                        (current_epoch, current_example * dev_count, num_train_examples,
-                         steps, np.mean(total_loss), tmp_acc,
-                         args.skip_steps / used_time))
+                        "epoch: {}/{}, progress: {}/{}({:.2f}%)  time: {}/{}, step: {}/{}({:.2f}%) \n ave loss: {:.8f}, ave acc: {:.4f}, speed: {:.4f} steps/s".format(
+                            current_epoch + 1,
+                            epoch,
+                            current_example * dev_count,
+                            num_train_examples,
+                            progress,
+                            used_time_str,
+                            total_time_str,
+                            steps,
+                            max_train_steps,
+                            round(100 * steps / max_train_steps, 2),
+                            np.mean(total_loss),
+                            tmp_acc,
+                            step_speed,
+                        )
+                    )
 
                     time_begin = time.time()
 
                 if steps % args.save_steps == 0:
-                    save_path = os.path.join(args.save_model_path,
-                                            "step_" + str(steps))
-                    fluid.io.save_persistables(self.exe, save_path, train_program)
-                    config_save_path = os.path.join(args.save_model_path, "config.json")
+                    save_path = os.path.join(
+                        args.save_model_path,
+                        "step_" + str(steps)
+                    )
+                    fluid.io.save_persistables(
+                        self.exe, save_path, train_program
+                    )
+                    config_save_path = os.path.join(
+                        args.save_model_path, "config.json"
+                    )
                     json.dump(self.config_dict, open(config_save_path, "w"))
                     shutil.copy(args.ernie_config_path, args.save_model_path)
                     shutil.copy(args.vocab_path, args.save_model_path)
@@ -341,4 +381,3 @@ class CrossEncoder(object):
                 shutil.copy(args.vocab_path, args.save_model_path)
                 train_pyreader.reset()
                 break
-
