@@ -19,10 +19,10 @@ def build_index(encoder_conf, index_file_name, title_list, para_list):
 
 if __name__ == '__main__':
     if len(sys.argv) != 4:
-        print ("USAGE: ")
-        print ("      python3 index.py ${language} ${data_file} ${index_file}")
-        print ("--For Example:")
-        print ("      python3 index.py zh ../data/dureader.para test.index")
+        print("USAGE: ")
+        print("      python3 index.py ${language} ${data_file} ${index_file}")
+        print("--For Example:")
+        print("      python3 index.py zh ../data/dureader.para test.index")
         exit()
 
     language = sys.argv[1]
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     elif language == 'en':
         model = 'v1_marco_de'
     else:
-        print ("illegal language, only [zh] and [en] is supported", file=sys.stderr)
+        print("illegal language, only [zh] and [en] is supported", file=sys.stderr)
         exit()
 
     para_list = []

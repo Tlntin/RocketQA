@@ -38,9 +38,9 @@ def init_checkpoint(exe, init_checkpoint_path, main_program):
         if not fluid.io.is_persistable(var):
             return False
         if not os.path.exists(os.path.join(init_checkpoint_path, var.name)):
-            print ("Var not exists: [%s]\t%s" % (var.name, os.path.join(init_checkpoint_path, var.name)))
+            print("Var not exists: [%s]\t%s" % (var.name, os.path.join(init_checkpoint_path, var.name)))
         #else:
-        #    print ("Var exists: [%s]" % (var.name))
+        #    print("Var exists: [%s]" % (var.name))
         return os.path.exists(os.path.join(init_checkpoint_path, var.name))
 
     fluid.io.load_vars(
@@ -60,9 +60,9 @@ def init_pretraining_params(exe,
         if not isinstance(var, fluid.framework.Parameter):
             return False
         if not os.path.exists(os.path.join(pretraining_params_path, var.name)):
-            print ("Var not exists: [%s]\t%s" % (var.name, os.path.join(pretraining_params_path, var.name)))
+            print("Var not exists: [%s]\t%s" % (var.name, os.path.join(pretraining_params_path, var.name)))
         #else:
-        #    print ("Var exists: [%s]" % (var.name))
+        #    print("Var exists: [%s]" % (var.name))
         return os.path.exists(os.path.join(pretraining_params_path, var.name))
 
     fluid.io.load_vars(

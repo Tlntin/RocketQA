@@ -363,7 +363,7 @@ def predict_wrapper(args, reader, exe, test_prog, test_pyreader, graph_vars,
         else:
             log.warning('save dir exsits: %s, will skip saving' % save_dir)
 
-        print ("DEBUG:\t" + str(len(probs)))
+        print("DEBUG:\t" + str(len(probs)))
         with open(save_path, 'w') as f:
             for p in probs:
                 f.write('{}\n'.format(p))

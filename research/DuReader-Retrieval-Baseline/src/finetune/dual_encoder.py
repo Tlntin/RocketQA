@@ -38,7 +38,7 @@ def create_model(args,
                  is_prediction=False,
                  task_name="",
                  fleet_handle=None):
-    print ("DEBUG:\tclassify")
+    print("DEBUG:\tclassify")
     pyreader = fluid.layers.py_reader(
         capacity=50,
         shapes=[[batch_size, args.q_max_seq_len, 1], [batch_size, args.q_max_seq_len, 1],
@@ -275,8 +275,8 @@ def evaluate(exe,
             test_pyreader.reset()
             break
     #for score in np_preds:
-    #    print (score)
-    #print ('---------------------')
+    #    print(score)
+    #print('---------------------')
     #time_end = time.time()
     #cost = total_cost / total_num_seqs
     #elapsed_time = time_end - time_begin
@@ -402,8 +402,8 @@ def predict(exe,
                 #emb_file.write(_right + '\n')
                 emb_file.write(str(item[2]) + '\n')
             #for score in batch_scores:
-            #    print (score)
-            #print ('--------')
+            #    print(score)
+            #print('--------')
             #if is_classify:
             #    np_preds = np.argmax(np_probs, axis=1).astype(np.float32)
             #    preds.extend(np_preds)

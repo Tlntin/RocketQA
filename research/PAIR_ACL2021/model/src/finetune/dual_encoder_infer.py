@@ -128,7 +128,7 @@ def build_engine(para_emb_list, dim):
     # add paragraph embedding
     p_emb_matrix = np.asarray(para_emb_list)
     index.add(p_emb_matrix.astype('float32'))
-    #print ("insert done", file=sys.stderr)
+    #print("insert done", file=sys.stderr)
     return index
 
 def predict(args,

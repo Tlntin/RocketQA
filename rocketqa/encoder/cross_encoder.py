@@ -154,7 +154,6 @@ class CrossEncoder(object):
         if 'log_folder' in config_dict:
             self.args.log_folder = config_dict['log_folder']
 
-
     def matching(self, query, para, title=[]):
 
         assert len(para) == len(query)

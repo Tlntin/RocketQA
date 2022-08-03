@@ -18,10 +18,10 @@ while 1:
     result = requests.post(SERVICE_ADD, json=input_data)
     res_json = json.loads(result.text)
 
-    print ("QUERY:\t" + query)
+    print("QUERY:\t" + query)
     for i in range(TOPK):
         title = res_json['answer'][i]['title']
         para = res_json['answer'][i]['para']
         score = res_json['answer'][i]['probability']
-        print ('{}'.format(i + 1) + '\t' + title + '\t' + para + '\t' + str(score))
+        print('{}'.format(i + 1) + '\t' + title + '\t' + para + '\t' + str(score))
 

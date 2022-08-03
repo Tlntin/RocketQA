@@ -131,7 +131,7 @@ def create_rocketqa_app(sub_address, rocketqa_server, language, data_file, index
     cross_encoder = rocketqa.load_model(**ce_conf)
 
     faiss_tool = FaissTool(data_file, index_file)
-    print ('Load index done')
+    print('Load index done')
 
     return web.Application([(sub_address, rocketqa_server, \
                         dict(faiss_tool=faiss_tool, \
@@ -142,15 +142,15 @@ def create_rocketqa_app(sub_address, rocketqa_server, language, data_file, index
 if __name__ == "__main__":
 
     if len(sys.argv) != 4:
-        print ("USAGE: ")
-        print ("      python3 rocketqa_service.py ${language} ${data_file} ${index_file}")
-        print ("--For Example:")
-        print ("      python3 rocketqa_service.py zh ../data/dureader.para test.index")
+        print("USAGE: ")
+        print("      python3 rocketqa_service.py ${language} ${data_file} ${index_file}")
+        print("--For Example:")
+        print("      python3 rocketqa_service.py zh ../data/dureader.para test.index")
         exit()
 
     language = sys.argv[1]
     if language != 'en' and language != 'zh':
-        print ("illegal language, only [zh] and [en] is supported", file=sys.stderr)
+        print("illegal language, only [zh] and [en] is supported", file=sys.stderr)
         exit()
 
     data_file = sys.argv[2]

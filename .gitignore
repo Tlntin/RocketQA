@@ -127,3 +127,5 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+de_en_log/
+de_en_models/

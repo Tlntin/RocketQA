@@ -445,4 +445,3 @@ class DualEncoder(object):
                 shutil.copy(self.args.vocab_path, self.args.save_model_path)
                 train_pyreader.reset()
                 break
-
