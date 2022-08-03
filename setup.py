@@ -31,7 +31,7 @@ setuptools.setup(
     url="https://github.com/PaddlePaddle/RocketQA",
     packages=setuptools.find_packages(
         where='.', exclude=('checkpoints*', 'research*', 'data*', 'inference_model*', 'examples*', 'dureader*')),
-    setup_requires=['cython', 'numpy'],
+    setup_requires=['cython', 'numpy', 'scipy'],
     install_requires=REQUIRED_PACKAGES,
     python_requires='>=3.6',
     classifiers=[
