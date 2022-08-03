@@ -41,6 +41,10 @@ Second, install rocketqa package (latest version: 1.1.0):
 ```bash
 $ pip install rocketqa
 ```
+or
+```
+$ pip install git+https://github.com/Tlntin/RocketQA.git
+```
 
 NOTE: this toolkit MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+.
 
