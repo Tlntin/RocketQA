@@ -31,11 +31,10 @@ We provide two installation methods: ***Python Installation Package*** and ***Do
 ### Install with Python Package
 First, install [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html).
 ```bash
-# GPU version:
-$ pip install paddlepaddle-gpu==2.2.2
+$ pip install paddlepaddle-gpu
 
 # CPU version:
-$ pip install paddlepaddle==2.2.2
+$ pip install paddlepaddle
 ```
 
 Second, install rocketqa package (latest version: 1.1.0):
@@ -45,16 +44,23 @@ $ pip install rocketqa
 
 NOTE: this toolkit MUST be running on Python3.6+ with [PaddlePaddle](https://www.paddlepaddle.org.cn/install/quick?docurl=/documentation/docs/zh/install/pip/linux-pip.html) 2.0+.
 
-### Install with Docker
+### Install with Docker(Recommend)
 
-- Sorry, there is currently no gpu mirror available!
-
-- This docker container just can be run in cpu environment.
+- use cpu
 
 ```bash
 docker pull rocketqa/rocketqa
 
 docker run -it docker.io/rocketqa/rocketqa bash
+```
+
+- use GPU
+```bash
+docker pull paddlepaddle/paddle:2.3.1-gpu-cuda11.2-cudnn8
+docker run xxx
+docker exec xxx /bin/bash
+pip install rocketqa
+pip install scipy
 ```
 
 ## Getting Started
