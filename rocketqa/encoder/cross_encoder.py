@@ -45,6 +45,9 @@ from rocketqa.utils.init import init_pretraining_params
 from rocketqa.utils.finetune_args import parser
 from rocketqa.utils.optimization import optimization
 
+from paddle.fluid.incubate.fleet.collective import fleet, DistributedStrategy
+import paddle.fluid.incubate.fleet.base.role_maker as role_maker
+
 
 class CrossEncoder(object):
     def __init__(self, conf_path, use_cuda=False, device_id=0, batch_size=1, **kwargs):
@@ -203,8 +206,10 @@ class CrossEncoder(object):
             os.makedirs(self.args.log_folder)
         prepare_logger(log, save_to_file=self.args.log_folder + '/log.train')
         print_arguments(args, log)
-        dev_count = 1
-
+        role = role_maker.PaddleCloudRoleMaker(is_collective=True)
+        fleet.init(role)
+        dev_count = fleet.worker_num()
+        # 构建数据读取器
         reader = reader_ce_train.CETrainReader(
             vocab_path=args.vocab_path,
             label_map_config=args.label_map_config,
@@ -222,11 +227,14 @@ class CrossEncoder(object):
         if args.random_seed is not None:
             startup_prog.random_seed = args.random_seed
 
+        # 正式读取数据
         train_data_generator = reader.data_generator(
             input_file=args.train_set,
             batch_size=args.batch_size,
             epoch=args.epoch,
-            dev_count=dev_count,
+            dev_count=1,
+            trainer_id=fleet.worker_index(),
+            trainer_num=fleet.worker_num(),
             shuffle=True,
             phase="train")
 
@@ -244,9 +252,17 @@ class CrossEncoder(object):
         log.info("Learning rate: %f" % self.args.learning_rate)
 
         train_program = fluid.Program()
+        exec_strategy = fluid.ExecutionStrategy()
+        exec_strategy.num_threads = dev_count
+        exec_strategy.num_iteration_per_drop_scope = 1
+        dist_strategy = DistributedStrategy()
+        dist_strategy.exec_strategy = exec_strategy
+        dist_strategy.nccl_comm_num = 1
+        dist_strategy.use_hierarchical_allreduce = True
 
         with fluid.program_guard(train_program, startup_prog):
             with fluid.unique_name.guard():
+                # 正式构建训练模型
                 train_pyreader, graph_vars = create_train_model(
                     args,
                     pyreader_name='train_reader',
@@ -264,7 +280,8 @@ class CrossEncoder(object):
                     incr_every_n_steps=args.incr_every_n_steps,
                     decr_every_n_nan_or_inf=args.decr_every_n_nan_or_inf,
                     incr_ratio=args.incr_ratio,
-                    decr_ratio=args.decr_ratio
+                    decr_ratio=args.decr_ratio,
+                    dist_strategy=dist_strategy
                 )
 
         if args.verbose:
@@ -299,6 +316,10 @@ class CrossEncoder(object):
         while True:
             try:
                 steps += 1
+                if fleet.worker_index() != 0:
+                    self.exe.run(fetch_list=[], program=train_program)
+                    continue
+
                 if steps % args.skip_steps != 0:
                     self.exe.run(fetch_list=[], program=train_program)
                 else:
